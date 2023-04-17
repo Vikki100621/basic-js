@@ -17,36 +17,30 @@ function transform(arr) {
   if (!Array.isArray(arr)) {
     throw new Error("'arr' parameter must be an instance of the Array!");
   }
-
-  const transformedArr = arr.filter((elem, index, arr) => {
-    switch (elem) {
-      case "--discard-next":
-        return index !== arr.length - 1;
-      case "--discard-prev":
-        return index !== 0 && arr[index - 2] !== "--discard-next";
-      case "--double-next":
-        return index !== arr.length - 1;
-      case "--double-prev":
-        return index !== 0 && arr[index - 2] !== "--discard-next";
-      default:
-        return true;
+  const result = [];
+  
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === '--discard-next') {
+      i++;
+    } else if (arr[i] === '--discard-prev') {
+      if (result.length !== 0 && arr[i - 2] !== '--discard-next') {
+        result.pop();
+      }
+    } else if (arr[i] === '--double-next') {
+      if (i < arr.length - 1) {
+        result.push(arr[i + 1]);
+      }
+    } else if (arr[i] === '--double-prev') {
+      if (i !== 0 && arr[i - 2] !== '--discard-next') {
+        result.push(arr[i - 1]);
+      }
+    } else {
+      result.push(arr[i]);
     }
-  }).map((elem, index, arr) => {
-    switch (elem) {
-      case "--double-next":
-        return arr[index + 1];
-      case "--double-prev":
-        return arr[index - 1];
-      default:
-        return elem;
-    }
-  });
+  }
 
-  return transformedArr.filter(elem => elem !== undefined);
+  return result;
 }
-
-
-
 
 module.exports = {
   transform
